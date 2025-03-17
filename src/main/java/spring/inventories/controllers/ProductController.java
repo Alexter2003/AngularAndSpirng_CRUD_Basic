@@ -3,7 +3,10 @@ package spring.inventories.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import spring.inventories.exceptions.NotFoundException;
 import spring.inventories.models.Product;
 import spring.inventories.services.ProductService;
 
@@ -20,16 +23,30 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products") //http://localhost:8080/api/inventarie/products
-    public List<Product> findAll(){
+    public ResponseEntity<List<Product>> findAll() {
         List<Product> products = this.productService.findAll();
         logger.info("Products: ");
         products.forEach(product -> logger.info(product.toString()));
-        return products;
+        return ResponseEntity.status(HttpStatus.OK).body(products);
     }
 
     @PostMapping("/products")
-    public Product addProduct(@RequestBody Product product){
+    public ResponseEntity<Product> addProduct(@RequestBody Product product) {
         logger.info("Product to add: " + product.toString());
-        return this.productService.save(product);
+        Product newProduct = this.productService.save(product);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(newProduct);
+    }
+
+    @GetMapping("/products/{id}")
+    public ResponseEntity<Product> findProductById(@PathVariable Integer id) {
+        logger.info("Product id to search: " + id);
+        Product product = this.productService.findById(id);
+
+        if (product != null) {
+            return ResponseEntity.ok(product);
+        } else {
+            throw new NotFoundException("Product not found with id " + id);
+        }
     }
 }
