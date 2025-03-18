@@ -9,15 +9,22 @@
         <th scope="col">Description</th>
         <th scope="col">Price</th>
         <th scope="col">Stock</th>
+        <th scope="col" class="text-center">Actions</th>
       </tr>
     </thead>
     <tbody>
-      @for (product of products; track product.product_id) {
+      @for (product of products; track product.id_product) {
       <tr>
         <th scope="row">{{product.id_product}}</th>
         <td>{{product.description}}</td>
         <td>{{product.price}}</td>
         <td>{{product.stock}}</td>
+        <td class="text-center">
+          <div>
+            <button (click)="editProduct(product.id_product)" class="btn btn-warning btn-sm me-3">Edit</button>
+            <button (click)="deleteProduct(product.id_product)" class="btn btn-danger btn-sm me-3">Delete</button>
+          </div>
+        </td>
       </tr>
       }
     </tbody>

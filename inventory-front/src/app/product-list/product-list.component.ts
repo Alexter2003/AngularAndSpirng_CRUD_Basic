@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-product-list',
@@ -11,6 +12,8 @@ export class ProductListComponent {
     products!: Product[];
 
     private productService = inject(ProductService);
+    private router = inject(Router);
+
 
     ngOnInit() {
       //load products
@@ -28,5 +31,16 @@ export class ProductListComponent {
           }
         }
       );
+    }
+
+    editProduct(id: number){
+      this.router.navigate(['edit-product', id]);
+    }
+
+    deleteProduct(id: number){
+      this.productService.deleteProduct(id).subscribe({
+        next: (data) => this.getProducts(),
+        error: (error) => console.log("Error to delete product ", error)
+      })
     }
 }
