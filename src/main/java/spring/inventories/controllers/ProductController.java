@@ -10,7 +10,9 @@ import spring.inventories.exceptions.NotFoundException;
 import spring.inventories.models.Product;
 import spring.inventories.services.ProductService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/inventory") //http://localhost:8080/api/inventory
@@ -48,5 +50,41 @@ public class ProductController {
         } else {
             throw new NotFoundException("Product not found with id " + id);
         }
+    }
+
+    @PutMapping("/products/{id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Integer id, @RequestBody Product product) {
+        logger.info("Product id to update: " + id);
+        Product updatedProduct = this.productService.findById(id);
+        if (updatedProduct != null) {
+            if (product.getDescription() != null) {
+                updatedProduct.setDescription(product.getDescription());
+            }
+
+            if (product.getPrice() != null) {
+                updatedProduct.setPrice(product.getPrice());
+            }
+
+            if (product.getStock() != null) {
+                updatedProduct.setStock(product.getStock());
+            }
+
+            updatedProduct = this.productService.save(updatedProduct);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedProduct);
+        } else {
+            throw new NotFoundException("Product not found with id " + id);
+        }
+    }
+
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<Map<String, Boolean>> deleteProduct(@PathVariable Integer id) {
+        logger.info("Product id to delete: " + id);
+        if (this.productService.findById(id) == null) {
+            throw new NotFoundException("Product not found with id " + id);
+        }
+        this.productService.deleteById(id);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("deleted", Boolean.TRUE);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
